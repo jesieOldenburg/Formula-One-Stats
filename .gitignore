@@ -8,6 +8,11 @@ db.sqlite3
 db.sqlite3-journal
 media
 
+# Migrations
+F1App/migrations/
+
+# Virtual ENV
+F1Env/
 
 ### Django.Python Stack ###
 # Byte-compiled / optimized / DLL files
