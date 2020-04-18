@@ -22,6 +22,7 @@ from F1App.views import *
 router = routers.DefaultRouter(trailing_slash=False)
 
 router.register(r'drivers', Drivers, 'driver')
+router.register(r'teams', Teams, 'team')
 
 urlpatterns = [
     path('', include(router.urls)),

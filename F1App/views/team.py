@@ -3,37 +3,33 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
-from F1App.models import Driver
+from F1App.models import Team
 
 
-class DriverSerializer(serializers.HyperlinkedModelSerializer):
+class TeamSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Driver
+        model = Team
         url = serializers.HyperlinkedIdentityField(
-            view_name='driver',
+            view_name='team',
             lookup_field='id'
         )
-        fields = ('id', 'url', 'name', 'team', 'teammate', 'season_points', 'championships', 'wins')
+        fields = ('id', 'url', 'team_name', 'team_points')
 
 
-class Drivers(ViewSet):
-
+class Teams(ViewSet):
+    
     def create(self, request):
         """Handle POST operations
 
         Returns:
-            Response -- JSON serialized Driver instance
+            Response -- JSON serialized ParkArea instance
         """
-        newdriver = Driver()
-        newdriver.name = request.data["name"]
-        newdriver.team = request.data["team"]
-        newdriver.teammate = request.data["teammate"]
-        newdriver.season_points = request.data["season_points"]
-        newdriver.championships = request.data["championships"]
-        newdriver.wins = request.data["wins"]
-        newdriver.save()
+        newteam = Team()
+        newteam.team_name = request.data["team_name"]
+        newteam.team_points = request.data["team_points"]
+        newteam.save()
 
-        serializer = DriverSerializer(newdriver, context={'request': request})
+        serializer = TeamSerializer(newteam, context={'request': request})
 
         return Response(serializer.data)
 
@@ -43,14 +39,10 @@ class Drivers(ViewSet):
         Returns:
             Response -- Empty body with 204 status code
         """
-        driver = Driver.objects.get(pk=pk)
-        driver.name = request.data["name"]
-        driver.team = request.data["team"]
-        driver.teammate = request.data["teammate"]
-        driver.season_points = request.data["season_points"]
-        driver.championships = request.data["championships"]
-        driver.wins = request.data["wins"]
-        driver.save()
+        team = Team.objects.get(pk=pk)
+        team.team_name = request.data["team_name"]
+        team.team_points = request.data["team_points"]
+        team.save()
 
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
@@ -61,12 +53,12 @@ class Drivers(ViewSet):
             Response -- 200, 404, or 500 status code
         """
         try:
-            driver = Driver.objects.get(pk=pk)
-            driver.delete()
+            team = Team.objects.get(pk=pk)
+            team.delete()
 
             return Response({}, status=status.HTTP_204_NO_CONTENT)
 
-        except Driver.DoesNotExist as ex:
+        except Team.DoesNotExist as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
 
         except Exception as ex:
@@ -79,8 +71,8 @@ class Drivers(ViewSet):
             Response -- JSON serialized driver instance
         """
         try:
-            driver = Driver.objects.get(pk=pk)
-            serializer = DriverSerializer(driver, context={'request': request})
+            team = Team.objects.get(pk=pk)
+            serializer = TeamSerializer(team, context={'request': request})
             return Response(serializer.data)
         except Exception as ex:
             return HttpResponseServerError(ex)
@@ -91,9 +83,9 @@ class Drivers(ViewSet):
         Returns:
             Response -- JSON serialized list of all drivers
         """
-        drivers = Driver.objects.all()
-        serializer = DriverSerializer(
-            drivers,
+        teams = Team.objects.all()
+        serializer = TeamSerializer(
+            teams,
             many=True,
             context={'request': request}
         )
