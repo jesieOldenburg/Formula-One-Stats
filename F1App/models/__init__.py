@@ -1,2 +1,2 @@
-from .drivers import Drivers
+from .drivers import Driver
 from .teams import Teams

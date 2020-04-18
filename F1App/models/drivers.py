@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-class Drivers(models.Model):
+class Driver(models.Model):
 
     name = models.CharField(max_length=30, null=True, blank=True)
     team = models.CharField(max_length=50, null=True, blank=True)
