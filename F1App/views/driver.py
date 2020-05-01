@@ -1,3 +1,5 @@
+import requests
+import pprint
 from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
@@ -5,6 +7,7 @@ from rest_framework import serializers
 from rest_framework import status
 from F1App.models import Driver
 
+pp = pprint.PrettyPrinter()
 
 class DriverSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -15,9 +18,31 @@ class DriverSerializer(serializers.HyperlinkedModelSerializer):
         )
         fields = ('id', 'url', 'name', 'team', 'teammate', 'season_points', 'championships', 'wins')
 
+def getDriverResults(query):
+    result_data = requests.get(query).json()
+    raceRounds = result_data["MRData"]["RaceTable"]["Races"]
+    for race in raceRounds:
+        print(race["round"])
+
+
+def initial_driver_retrieval():
+    data = requests.get('https://ergast.com/api/f1/2019/drivers.json')
+    parsedData = data.json()
+    driverList = parsedData["MRData"]["DriverTable"]["Drivers"]
+    for driver in driverList:
+        # print(driver["driverId"])
+        driverId = driver["driverId"]
+        queryString = f'https://ergast.com/api/f1/2018/drivers/{driverId}/results.json'
+        getDriverResults(queryString)
+        # print(driver["givenName"] + ' ' + driver["familyName"])
 
 class Drivers(ViewSet):
 
+    # def initial_driver_retrieval(self, request):
+    #     data = requests.get('https://ergast.com/api/f1/2019/drivers.json')
+    #     parsedData = data.json()
+    #     return print(parsedData)
+    
     def create(self, request):
         """Handle POST operations
 
@@ -91,6 +116,7 @@ class Drivers(ViewSet):
         Returns:
             Response -- JSON serialized list of all drivers
         """
+        initial_driver_retrieval()
         drivers = Driver.objects.all()
         serializer = DriverSerializer(
             drivers,
